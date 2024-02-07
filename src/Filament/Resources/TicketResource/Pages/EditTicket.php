@@ -20,7 +20,7 @@ class EditTicket extends EditRecord
         return [DeleteAction::make()];
     }
 
-    protected function getTitle(): string
+    public function getTitle(): string
     {
         $interacted = $this->record?->ticketable;
 

@@ -7,44 +7,67 @@ use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Resources\Table;
+use Filament\Tables\Table;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Illuminate\Database\Eloquent\Builder;
 use Sgcomptech\FilamentTicketing\Filament\Resources\TicketResource\RelationManagers\CommentsRelationManager;
 use Sgcomptech\FilamentTicketing\Models\Ticket;
+use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
 
-class TicketResource extends Resource
+
+class TicketResource extends Resource implements HasShieldPermissions
 {
     protected static ?string $model = Ticket::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-ticket';
 
-    protected static function getNavigationLabel(): string
+
+    public static function getNavigationLabel(): string
     {
         return __('Ticket');
     }
 
-    protected static function getNavigationGroup(): ?string
+    public static function getNavigationGroup(): ?string
     {
         return __(config('filament-ticketing.navigation.group'));
     }
 
-    protected static function getNavigationSort(): ?int
+    public static function getNavigationSort(): ?int
     {
         return config('filament-ticketing.navigation.sort');
+    }
+
+        public static function getPermissionPrefixes(): array
+    {
+        return [
+            'view',
+            'view_any',
+            'create',
+            'update',
+            'restore',
+            'restore_any',
+            'recorder',
+            'delete',
+            'delete_any',
+            'force_delete',
+            'force_delete_any',
+            'manageAllTickets',
+            'manageAssignedTickets',
+            'assignTickets',
+        ];
     }
 
     public static function form(Form $form): Form
     {
         $user = auth()->user();
         if (config('filament-ticketing.use_authorization')) {
-            $cannotManageAllTickets = $user->cannot('manageAllTickets', Ticket::class);
-            $cannotManageAssignedTickets = $user->cannot('manageAssignedTickets', Ticket::class);
-            $cannotAssignTickets = $user->cannot('assignTickets', Ticket::class);
+            $cannotManageAllTickets = $user->cannot('manageAllTickets_ticket');
+            $cannotManageAssignedTickets = $user->cannot('manageAssignedTickets_ticket', Ticket::class);
+            $cannotAssignTickets = $user->cannot('assignTickets_ticket', Ticket::class);
         } else {
             $cannotManageAllTickets = false;
             $cannotManageAssignedTickets = false;
@@ -102,7 +125,7 @@ class TicketResource extends Resource
                             return config('filament-ticketing.user-model')::where('name', 'like', "%{$search}%")
                                 ->limit(50)
                                 ->get()
-                                ->filter(fn ($user) => $user->can('manageAssignedTickets', Ticket::class))
+                                ->filter(fn ($user) => $user->can('manageAssignedTickets_ticket'))
                                 ->pluck('name', 'id');
                         })
                         ->getOptionLabelUsing(fn ($value): ?string => config('filament-ticketing.user-model')::find($value)?->name)
@@ -116,8 +139,8 @@ class TicketResource extends Resource
     {
         $user = auth()->user();
         if (config('filament-ticketing.use_authorization')) {
-            $canManageAllTickets = $user->can('manageAllTickets', Ticket::class);
-            $canManageAssignedTickets = $user->can('manageAssignedTickets', Ticket::class);
+            $canManageAllTickets = $user->can('manageAllTickets_ticket', Ticket::class);
+            $canManageAssignedTickets = $user->can('manageAssignedTickets_ticket', Ticket::class);
         } else {
             $canManageAllTickets = true;
             $canManageAssignedTickets = true;

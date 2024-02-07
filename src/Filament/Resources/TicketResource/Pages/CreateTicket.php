@@ -35,7 +35,7 @@ class CreateTicket extends CreateRecord
         return $data;
     }
 
-    protected function getSubheading(): ?string
+    public function getSubheading(): ?string
     {
         if ($this->rec) {
             $recInstance = $this->rec::findOrFail($this->recid);
@@ -51,7 +51,7 @@ class CreateTicket extends CreateRecord
         NewTicket::dispatch($this->record);
     }
 
-    protected function getTitle(): string
+    public function getTitle(): string
     {
         return __('Create Ticket');
     }

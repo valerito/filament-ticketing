@@ -3,9 +3,9 @@
 namespace Sgcomptech\FilamentTicketing\Filament\Resources\TicketResource\RelationManagers;
 
 use Filament\Forms\Components\Textarea;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Resources\Table;
+use Filament\Tables\Table;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\Layout\Split;
 use Filament\Tables\Columns\Layout\Stack;
@@ -23,7 +23,7 @@ class CommentsRelationManager extends RelationManager
 
     protected static ?string $recordTitleAttribute = 'user.name';
 
-    public static function form(Form $form): Form
+    public function form(Form $form): Form
     {
         return $form
             ->schema([
@@ -31,7 +31,7 @@ class CommentsRelationManager extends RelationManager
             ]);
     }
 
-    public static function table(Table $table): Table
+    public function table(Table $table): Table
     {
         $user = auth()->user();
 
@@ -66,7 +66,7 @@ class CommentsRelationManager extends RelationManager
                             config('filament-ticketing.use_authorization') == false ||
                             $ticket->user_id == $user->id ||
                             $ticket->assigned_to_id == $user->id ||
-                            $user->can('manageAllTickets', Ticket::class),
+                            $user->can('manageAllTickets_ticket', Ticket::class),
                             403
                         );
                         $comment = Comment::create([
@@ -84,8 +84,8 @@ class CommentsRelationManager extends RelationManager
             ->defaultSort('id', 'desc');
     }
 
-    public static function getTitle(): string
+    /*public static function getTitle(): string
     {
         return __('Comments');
-    }
+    }*/
 }

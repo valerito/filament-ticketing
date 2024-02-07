@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\HtmlString;
 use Sgcomptech\FilamentTicketing\Models\Ticket;
+use Filament\Actions;
 
 class ListTicket extends ListRecords
 {
@@ -33,18 +34,11 @@ class ListTicket extends ListRecords
         return config('filament-ticketing.ticket-resource');
     }
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
-        if (config('filament-ticketing.is_strictly_interacted') && empty($this->rec)) {
-            return [];
-        } else {
-            return [
-                CreateAction::make()->url(route(
-                    'filament.resources.tickets.create',
-                    ['rec' => $this->rec, 'recid' => $this->recid]
-                )),
-            ];
-        }
+        return [
+            Actions\CreateAction::make(),
+        ];
     }
 
     public function getTableHeading(): Htmlable|null
@@ -79,7 +73,7 @@ class ListTicket extends ListRecords
             : $builder;
     }
 
-    protected function getTitle(): string
+    public function getTitle(): string
     {
         return __('Tickets');
     }
