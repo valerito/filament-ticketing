@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('comments', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('user_id');
+            $table->uuid('user_id');
             $table->foreignId('ticket_id');
             $table->text('content');
             $table->timestamps();

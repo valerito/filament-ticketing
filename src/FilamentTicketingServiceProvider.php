@@ -2,10 +2,10 @@
 
 namespace Sgcomptech\FilamentTicketing;
 
-use Filament\PluginServiceProvider;
+use Spatie\LaravelPackageTools\PackageServiceProvider;
 use Spatie\LaravelPackageTools\Package;
 
-class FilamentTicketingServiceProvider extends PluginServiceProvider
+class FilamentTicketingServiceProvider extends PackageServiceProvider
 {
     public static string $name = 'filament-ticketing';
 

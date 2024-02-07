@@ -13,8 +13,8 @@ return new class extends Migration
             $table->string('identifier', 10)->unique();
             $table->string('ticketable_type')->nullable();
             $table->bigInteger('ticketable_id')->nullable();
-            $table->bigInteger('user_id');
-            $table->bigInteger('assigned_to_id')->nullable();
+            $table->uuid('user_id');
+            $table->uuid('assigned_to_id')->nullable();
             $table->tinyInteger('status')->default(0);
             $table->tinyInteger('priority')->default(0);
             $table->string('title');
