@@ -7,6 +7,7 @@ namespace Sgcomptech\FilamentTicketing;
 //use BezhanSalleh\FilamentShield\Support\Utils;
 use Filament\Contracts\Plugin;
 use Filament\Panel;
+use Filament\Widgets\Widget;
 
 class FilamentTicketingPlugin implements Plugin
 {
@@ -25,9 +26,11 @@ class FilamentTicketingPlugin implements Plugin
     public function register(Panel $panel): void
     {
         //if (! Utils::isResourcePublished()) {
-            $panel->resources([
-                Filament\Resources\TicketResource::class,
-            ]);
+        $panel->resources([
+            Filament\Resources\TicketResource::class,
+        ])->widgets([
+            Filament\Resources\Widgets\TicketOverview::class,
+        ]);
         //}
     }
 
