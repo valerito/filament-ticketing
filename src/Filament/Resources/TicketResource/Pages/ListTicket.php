@@ -58,7 +58,9 @@ class ListTicket extends ListRecords
             if ($user->can('manageAllTickets', Ticket::class)) {
                 $builder = parent::getTableQuery();
             } elseif ($user->can('manageAssignedTickets', Ticket::class)) {
-                $builder = parent::getTableQuery()->where('assigned_to_id', $user->id);
+                $builder = parent::getTableQuery()->whereHas('assigned_to', function ($query) use ($user) {
+                    $query->where('user_id', $user->id);
+                });
             } else {
                 $builder = parent::getTableQuery()->where('user_id', $user->id);
             }

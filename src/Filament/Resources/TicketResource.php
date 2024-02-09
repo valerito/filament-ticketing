@@ -2,6 +2,7 @@
 
 namespace Sgcomptech\FilamentTicketing\Filament\Resources;
 
+use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
@@ -15,6 +16,8 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Illuminate\Database\Eloquent\Builder;
 use Sgcomptech\FilamentTicketing\Filament\Resources\TicketResource\RelationManagers\CommentsRelationManager;
+use Sgcomptech\FilamentTicketing\Filament\Resources\TicketResource\RelationManagers\UsersRelationManager;
+use Sgcomptech\FilamentTicketing\Models\Category;
 use Sgcomptech\FilamentTicketing\Models\Ticket;
 use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
 
@@ -24,7 +27,6 @@ class TicketResource extends Resource implements HasShieldPermissions
     protected static ?string $model = Ticket::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-ticket';
-
 
     public static function getNavigationLabel(): string
     {
@@ -105,7 +107,7 @@ class TicketResource extends Resource implements HasShieldPermissions
                         ->required()
                         ->disabled(fn ($record) => (
                             $cannotManageAllTickets &&
-                            ($cannotManageAssignedTickets || $record?->assigned_to_id != $user->id)
+                            ($cannotManageAssignedTickets || !$record->assigned_to()->contains($user->id))
                         ))
                         ->hiddenOn('create'),
                     Select::make('priority')
@@ -113,7 +115,44 @@ class TicketResource extends Resource implements HasShieldPermissions
                         ->options($priorities)
                         ->disabledOn('edit')
                         ->required(),
-                    Select::make('assigned_to_id')
+                    Select::make('category_id')
+                        ->translateLabel()
+                        ->options(
+                            collect(Category::all())
+                                ->pluck('name', 'id')
+                                ->toArray()
+                        )
+                        ->createOptionAction(
+                            fn (Action $action) => $action->hidden(function () {
+                                $roles = auth()->user()->roles->pluck('name');
+                                return !$roles->contains('super_admin');
+                            })
+                        )
+                        ->createOptionForm([
+                            TextInput::make('name')
+                                ->required()
+                                ->maxLength(255),
+                            Select::make('users')
+                                ->translateLabel()
+                                ->options(
+                                    collect(config('filament-ticketing.user-model')::all())
+                                        ->pluck('name', 'id')
+                                        ->toArray()
+                                )
+                                ->multiple()
+                                ->required(),
+                        ])
+                        ->createOptionUsing(function ($data) {
+                            //create category and relate to user
+                            $category = Category::create([
+                                'name' => $data['name'],
+                            ]);
+                            $category->users()->attach($data['users']);
+                            return $category->id;
+                        })
+                        ->disabledOn('edit')
+                        ->required(),
+                    Select::make('assigned_to')
                         ->label(__('Assign Ticket To'))
                         ->hint(__('Key in 3 or more characters to begin search'))
                         ->searchable()
@@ -128,6 +167,8 @@ class TicketResource extends Resource implements HasShieldPermissions
                                 ->filter(fn ($user) => $user->can('manageAssignedTickets_ticket'))
                                 ->pluck('name', 'id');
                         })
+                        ->multiple()
+                        ->relationship('assigned_to', 'name')
                         ->getOptionLabelUsing(fn ($value): ?string => config('filament-ticketing.user-model')::find($value)?->name)
                         ->disabled($cannotAssignTickets)
                         ->hiddenOn('create'),
@@ -169,6 +210,9 @@ class TicketResource extends Resource implements HasShieldPermissions
                     ->translateLabel()
                     ->formatStateUsing(fn ($record) => $priorities[$record->priority] ?? '-')
                     ->color(fn ($record) => $record->priorityColor()),
+                TextColumn::make('category.name')
+                    ->translateLabel()
+                    ->searchable(),
                 TextColumn::make('assigned_to.name')
                     ->translateLabel()
                     ->visible($canManageAllTickets || $canManageAssignedTickets),

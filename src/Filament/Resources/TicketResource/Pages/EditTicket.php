@@ -8,7 +8,7 @@ use Sgcomptech\FilamentTicketing\Events\NewAssignment;
 
 class EditTicket extends EditRecord
 {
-    public $prev_assigned_to_id;
+    public $prev_assigned_to;
 
     public static function getResource(): string
     {
@@ -29,12 +29,12 @@ class EditTicket extends EditRecord
 
     protected function afterFill()
     {
-        $this->prev_assigned_to_id = $this->record->assigned_to_id;
+        $this->prev_assigned_to = $this->record->assigned_to()->get();
     }
 
     protected function afterSave()
     {
-        if ($this->record->assigned_to_id != $this->prev_assigned_to_id) {
+        if($this->record->assigned_to()->get()->diff($this->prev_assigned_to)->isNotEmpty()){
             NewAssignment::dispatch($this->record);
         }
     }
