@@ -16,6 +16,7 @@ use Sgcomptech\FilamentTicketing\Events\NewComment;
 use Sgcomptech\FilamentTicketing\Events\NewResponse;
 use Sgcomptech\FilamentTicketing\Models\Comment;
 use Sgcomptech\FilamentTicketing\Models\Ticket;
+use Filament\Forms\Components\RichEditor;
 
 class CommentsRelationManager extends RelationManager
 {
@@ -49,14 +50,14 @@ class CommentsRelationManager extends RelationManager
                             ->dateTime()
                             ->color('secondary'),
                     ]),
-                    TextColumn::make('content')->wrap(),
+                    TextColumn::make('content')->wrap()->html(true),
                 ]),
             ])
             ->headerActions([
                 Action::make('addComment')
                     ->label(__('Add Comment'))
                     ->form([
-                        Textarea::make('content')
+                        RichEditor::make('content')
                             ->translateLabel()
                             ->required(),
                     ])

@@ -20,6 +20,7 @@ use Sgcomptech\FilamentTicketing\Filament\Resources\TicketResource\RelationManag
 use Sgcomptech\FilamentTicketing\Models\Category;
 use Sgcomptech\FilamentTicketing\Models\Ticket;
 use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
+use Filament\Forms\Components\RichEditor;
 
 
 class TicketResource extends Resource implements HasShieldPermissions
@@ -96,7 +97,7 @@ class TicketResource extends Resource implements HasShieldPermissions
                         ->maxLength(255)
                         ->columnSpan(2)
                         ->disabledOn('edit'),
-                    Textarea::make('content')
+                    RichEditor::make('content')
                         ->translateLabel()
                         ->required()
                         ->columnSpan(2)
