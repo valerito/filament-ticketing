@@ -5,6 +5,7 @@ namespace Sgcomptech\FilamentTicketing\Filament\Resources\TicketResource\Pages;
 use Filament\Pages\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 use Sgcomptech\FilamentTicketing\Events\NewAssignment;
+use Sgcomptech\FilamentTicketing\Models\Ticket;
 
 class EditTicket extends EditRecord
 {
@@ -29,13 +30,14 @@ class EditTicket extends EditRecord
 
     protected function afterFill()
     {
-        $this->prev_assigned_to = $this->record->assigned_to()->get();
+        $this->prev_assigned_to = Ticket::find($this->record->id)->assigned_to()->get();
     }
 
     protected function afterSave()
     {
-        if($this->record->assigned_to()->get()->diff($this->prev_assigned_to)->isNotEmpty()){
-            NewAssignment::dispatch($this->record);
+        if(Ticket::find($this->record->id)->assigned_to()->get()->diff($this->prev_assigned_to)->isNotEmpty()){
+            NewAssignment::dispatch(Ticket::find($this->record->id)->assigned_to()->get()->diff($this->prev_assigned_to), $this->record);
         }
+        $this->prev_assigned_to = Ticket::find($this->record->id)->assigned_to()->get();
     }
 }

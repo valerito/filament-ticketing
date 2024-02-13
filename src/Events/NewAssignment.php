@@ -2,8 +2,12 @@
 
 namespace Sgcomptech\FilamentTicketing\Events;
 
+use App\Models\User;
+use Filament\Notifications\Events\DatabaseNotificationsSent;
+use Filament\Notifications\Notification;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 use Sgcomptech\FilamentTicketing\Models\Ticket;
@@ -20,7 +24,7 @@ class NewAssignment
      * @param  Sgcomptech\FilamentTicketing\Models\Ticket  $ticket
      * @return void
      */
-    public function __construct(public Ticket $ticket)
+    public function __construct(public Collection $users, public Ticket $ticket)
     {
     }
 

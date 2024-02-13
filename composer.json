@@ -24,7 +24,8 @@
         "filament/filament": "^3.0",
         "illuminate/contracts": "^9.0|^10.0",
         "laravel/framework": "^9.0|^10.0",
-        "spatie/laravel-package-tools": "^1.14"
+        "spatie/laravel-package-tools": "^1.14",
+        "filament/notifications": "^3.2"
     },
     "require-dev": {
         "filament/spatie-laravel-settings-plugin": "^2.16",
